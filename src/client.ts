@@ -164,9 +164,9 @@ class WikiAPI {
 class ReviewConfigsAPI {
   private c: ViperClient
   constructor(c: ViperClient) { this.c = c }
-  list(opts?: RequestOptions) { return this.c.get<ReviewConfigListResponse>('/api/settings/review', opts) }
-  create(data: Partial<ReviewConfig>, opts?: RequestOptions) { return this.c.post<CreateReviewConfigResponse>('/api/settings/review', data, opts) }
-  update(id: string, data: Partial<ReviewConfig>, opts?: RequestOptions) { return this.c.put<StatusResponse>(`/api/settings/review/${id}`, data, opts) }
+  list(opts?: RequestOptions) { return this.c.get<ReviewConfigListResponse>('/api/review-config', opts) }
+  create(data: Partial<ReviewConfig>, opts?: RequestOptions) { return this.c.post<CreateReviewConfigResponse>('/api/review-config', data, opts) }
+  update(id: string, data: Partial<ReviewConfig>, opts?: RequestOptions) { return this.c.put<StatusResponse>(`/api/review-config/${id}`, data, opts) }
 }
 
 class SettingsAPI {
