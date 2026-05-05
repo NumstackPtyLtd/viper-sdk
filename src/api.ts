@@ -1,5 +1,5 @@
 import type {
-  User, Organisation, Review, Finding, Token, Connection,
+  User, Review, Finding, Token, Connection,
   Project, WikiEntry, ReviewConfig,
 } from './entities.js'
 

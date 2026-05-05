@@ -11,7 +11,7 @@ import type {
   ProviderTypesResponse, ServerStatusResponse, HealthResponse,
   ErrorResponse,
 } from './api.js'
-import type { ReviewConfig } from './entities.js'
+import type { ReviewConfig, WikiEntry } from './entities.js'
 
 export interface ClientOptions {
   baseUrl: string
@@ -24,8 +24,10 @@ export interface RequestOptions {
 }
 
 export class ViperError extends Error {
-  constructor(public readonly status: number, message: string) {
+  readonly status: number
+  constructor(status: number, message: string) {
     super(message)
+    this.status = status
     this.name = 'ViperError'
   }
 }
@@ -99,7 +101,8 @@ export class ViperClient {
 }
 
 class AuthAPI {
-  constructor(private c: ViperClient) {}
+  private c: ViperClient
+  constructor(c: ViperClient) { this.c = c }
   signup(data: SignupRequest, opts?: RequestOptions) { return this.c.post<SignupResponse>('/api/signup', data, opts) }
   login(data: LoginRequest, opts?: RequestOptions) { return this.c.post<LoginResponse>('/api/auth/login', data, opts) }
   session(opts?: RequestOptions) { return this.c.get<SessionResponse>('/api/auth/session', opts) }
@@ -107,7 +110,8 @@ class AuthAPI {
 }
 
 class ReviewsAPI {
-  constructor(private c: ViperClient) {}
+  private c: ViperClient
+  constructor(c: ViperClient) { this.c = c }
   list(params?: ReviewListParams, opts?: RequestOptions) {
     const qs = params ? '?' + new URLSearchParams(Object.entries(params).filter(([, v]) => v != null).map(([k, v]) => [k, String(v)])).toString() : ''
     return this.c.get<ReviewListResponse>(`/api/reviews${qs}`, opts)
@@ -117,7 +121,8 @@ class ReviewsAPI {
 }
 
 class TokensAPI {
-  constructor(private c: ViperClient) {}
+  private c: ViperClient
+  constructor(c: ViperClient) { this.c = c }
   list(opts?: RequestOptions) { return this.c.get<TokenListResponse>('/api/tokens', opts) }
   create(data: CreateTokenRequest, opts?: RequestOptions) { return this.c.post<CreateTokenResponse>('/api/tokens', data, opts) }
   update(id: string, data: Partial<CreateTokenRequest & { is_default: boolean }>, opts?: RequestOptions) { return this.c.put<StatusResponse>(`/api/tokens/${id}`, data, opts) }
@@ -125,43 +130,48 @@ class TokensAPI {
 }
 
 class ConnectionsAPI {
-  constructor(private c: ViperClient) {}
+  private c: ViperClient
+  constructor(c: ViperClient) { this.c = c }
   list(opts?: RequestOptions) { return this.c.get<ConnectionListResponse>('/api/connections', opts) }
   create(data: CreateConnectionRequest, opts?: RequestOptions) { return this.c.post<CreateConnectionResponse>('/api/connections', data, opts) }
   delete(id: string, opts?: RequestOptions) { return this.c.del<StatusResponse>(`/api/connections/${id}`, opts) }
 }
 
 class ProjectsAPI {
-  constructor(private c: ViperClient) {}
+  private c: ViperClient
+  constructor(c: ViperClient) { this.c = c }
   list(opts?: RequestOptions) { return this.c.get<ProjectListResponse>('/api/projects', opts) }
   create(data: CreateProjectRequest, opts?: RequestOptions) { return this.c.post<CreateProjectResponse>('/api/projects', data, opts) }
   delete(id: string, opts?: RequestOptions) { return this.c.del<StatusResponse>(`/api/projects/${id}`, opts) }
 }
 
 class WikiAPI {
-  constructor(private c: ViperClient) {}
+  private c: ViperClient
+  constructor(c: ViperClient) { this.c = c }
   list(params?: WikiListParams, opts?: RequestOptions) {
     const qs = params ? '?' + new URLSearchParams(Object.entries(params).filter(([, v]) => v != null).map(([k, v]) => [k, String(v)])).toString() : ''
     return this.c.get<WikiListResponse>(`/api/wiki${qs}`, opts)
   }
-  get(id: string, opts?: RequestOptions) { return this.c.get<{ entry: import('./entities.js').WikiEntry }>(`/api/wiki/${id}`, opts) }
+  get(id: string, opts?: RequestOptions) { return this.c.get<{ entry: WikiEntry }>(`/api/wiki/${id}`, opts) }
   create(data: CreateWikiRequest, opts?: RequestOptions) { return this.c.post<StatusResponse & { id: string }>('/api/wiki', data, opts) }
   update(id: string, data: UpdateWikiRequest, opts?: RequestOptions) { return this.c.put<StatusResponse>(`/api/wiki/${id}`, data, opts) }
   delete(id: string, opts?: RequestOptions) { return this.c.del<StatusResponse>(`/api/wiki/${id}`, opts) }
   search(q: string, opts?: RequestOptions) { return this.c.get<WikiSearchResponse>(`/api/wiki/search?q=${encodeURIComponent(q)}`, opts) }
-  stats(opts?: RequestOptions) { return this.c.get<import('./api.js').WikiStatsResponse>('/api/wiki/stats', opts) }
+  stats(opts?: RequestOptions) { return this.c.get<WikiStatsResponse>('/api/wiki/stats', opts) }
   import(data: WikiImportRequest, opts?: RequestOptions) { return this.c.post<WikiImportResponse>('/api/wiki/import', data, opts) }
 }
 
 class ReviewConfigsAPI {
-  constructor(private c: ViperClient) {}
+  private c: ViperClient
+  constructor(c: ViperClient) { this.c = c }
   list(opts?: RequestOptions) { return this.c.get<ReviewConfigListResponse>('/api/settings/review', opts) }
   create(data: Partial<ReviewConfig>, opts?: RequestOptions) { return this.c.post<CreateReviewConfigResponse>('/api/settings/review', data, opts) }
   update(id: string, data: Partial<ReviewConfig>, opts?: RequestOptions) { return this.c.put<StatusResponse>(`/api/settings/review/${id}`, data, opts) }
 }
 
 class SettingsAPI {
-  constructor(private c: ViperClient) {}
+  private c: ViperClient
+  constructor(c: ViperClient) { this.c = c }
   list(opts?: RequestOptions) { return this.c.get<SettingsListResponse>('/api/settings', opts) }
   set(key: string, value: string, opts?: RequestOptions) { return this.c.put<StatusResponse>(`/api/settings/${key}`, { value }, opts) }
   bulkSet(data: Record<string, string>, opts?: RequestOptions) { return this.c.put<StatusResponse>('/api/settings', data, opts) }
@@ -172,7 +182,8 @@ class SettingsAPI {
 }
 
 class ProvidersAPI {
-  constructor(private c: ViperClient) {}
+  private c: ViperClient
+  constructor(c: ViperClient) { this.c = c }
   vcsTypes(opts?: RequestOptions) { return this.c.get<ProviderTypesResponse>('/api/vcs/types', opts) }
   aiTypes(opts?: RequestOptions) { return this.c.get<ProviderTypesResponse>('/api/ai/types', opts) }
 }
