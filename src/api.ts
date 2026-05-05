@@ -1,6 +1,6 @@
 import type {
   User, Review, Finding, Token, Connection,
-  Project, WikiEntry, ReviewConfig,
+  Project, WikiEntry, ReviewConfig, Policy,
 } from './entities.js'
 
 // --- Auth ---
@@ -33,19 +33,26 @@ export interface ProjectListResponse { projects: Project[] }
 export interface CreateProjectResponse { status: string; id: string }
 
 // --- Wiki ---
-export interface CreateWikiRequest { title: string; content: string; category: string; tags?: string[]; scope?: string[]; project_id?: string }
-export interface UpdateWikiRequest { title?: string; content?: string; category?: string; tags?: string[]; scope?: string[]; project_id?: string }
-export interface WikiListParams { category?: string; project_id?: string }
-export interface WikiListResponse { entries: WikiEntry[] }
+export interface CreateWikiRequest { title: string; content: string; category: string; tags?: string[]; owner_type?: string; owner_id?: string }
+export interface UpdateWikiRequest { title?: string; content?: string; category?: string; tags?: string[]; owner_type?: string; owner_id?: string }
+export interface WikiListParams { owner_type?: string; owner_id?: string; category?: string; q?: string; limit?: number; offset?: number }
+export interface WikiListResponse { entries: WikiEntry[]; total: number }
 export interface WikiSearchResponse { results: WikiEntry[] }
 export interface WikiStatsResponse {
-  total: number; orgWide: number; neverMatched: number
-  byCategory: Record<string, number>; byProject: Record<string, number>
-  projects: Array<{ id: string; name: string }>
+  total: number; neverMatched: number
+  byCategory: Record<string, number>
+  allTags: string[]
   staleEntries: WikiEntry[]; topMatched: WikiEntry[]
 }
-export interface WikiImportRequest { entries: Array<Omit<CreateWikiRequest, 'project_id'>> }
+export interface WikiImportRequest { entries: Array<Omit<CreateWikiRequest, 'owner_type' | 'owner_id'>> }
 export interface WikiImportResponse { status: string; count: number }
+
+// --- Policies ---
+export interface CreatePolicyRequest { name: string; description?: string; resource_type: string; resource_id?: string; target_type: string; target_id?: string; effect?: string; priority?: number; conditions?: { scope?: string[]; branches?: string[] } }
+export interface UpdatePolicyRequest { name?: string; description?: string; resource_type?: string; resource_id?: string; target_type?: string; target_id?: string; effect?: string; priority?: number; conditions?: { scope?: string[]; branches?: string[] }; enabled?: boolean }
+export interface PolicyListParams { resource_type?: string; target_type?: string; target_id?: string }
+export interface PolicyListResponse { policies: Policy[] }
+export interface PolicyPreviewResponse { entries: Array<{ entry: WikiEntry; effect: string; policy_name: string; priority: number }> }
 
 // --- Review Config ---
 export interface ReviewConfigListResponse { configs: ReviewConfig[] }

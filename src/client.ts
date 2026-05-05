@@ -6,12 +6,13 @@ import type {
   CreateProjectRequest, ProjectListResponse, CreateProjectResponse,
   CreateWikiRequest, UpdateWikiRequest, WikiListParams, WikiListResponse,
   WikiSearchResponse, WikiStatsResponse, WikiImportRequest, WikiImportResponse,
+  CreatePolicyRequest, UpdatePolicyRequest, PolicyListParams, PolicyListResponse, PolicyPreviewResponse,
   ReviewConfigListResponse, CreateReviewConfigResponse,
   SettingsListResponse,
   ProviderTypesResponse, ServerStatusResponse, HealthResponse,
   ErrorResponse,
 } from './api.js'
-import type { ReviewConfig, WikiEntry } from './entities.js'
+import type { ReviewConfig, WikiEntry, Policy } from './entities.js'
 
 export interface ClientOptions {
   baseUrl: string
@@ -43,6 +44,7 @@ export class ViperClient {
   readonly connections: ConnectionsAPI
   readonly projects: ProjectsAPI
   readonly wiki: WikiAPI
+  readonly policies: PoliciesAPI
   readonly reviewConfigs: ReviewConfigsAPI
   readonly settings: SettingsAPI
   readonly providers: ProvidersAPI
@@ -61,6 +63,7 @@ export class ViperClient {
     this.connections = new ConnectionsAPI(this)
     this.projects = new ProjectsAPI(this)
     this.wiki = new WikiAPI(this)
+    this.policies = new PoliciesAPI(this)
     this.reviewConfigs = new ReviewConfigsAPI(this)
     this.settings = new SettingsAPI(this)
     this.providers = new ProvidersAPI(this)
@@ -157,8 +160,25 @@ class WikiAPI {
   update(id: string, data: UpdateWikiRequest, opts?: RequestOptions) { return this.c.put<StatusResponse>(`/api/wiki/${id}`, data, opts) }
   delete(id: string, opts?: RequestOptions) { return this.c.del<StatusResponse>(`/api/wiki/${id}`, opts) }
   search(q: string, opts?: RequestOptions) { return this.c.get<WikiSearchResponse>(`/api/wiki/search?q=${encodeURIComponent(q)}`, opts) }
-  stats(opts?: RequestOptions) { return this.c.get<WikiStatsResponse>('/api/wiki/stats', opts) }
+  stats(params?: { owner_type?: string; owner_id?: string }, opts?: RequestOptions) {
+    const qs = params ? '?' + new URLSearchParams(Object.entries(params).filter(([, v]) => v != null).map(([k, v]) => [k, String(v)])).toString() : ''
+    return this.c.get<WikiStatsResponse>(`/api/wiki/stats${qs}`, opts)
+  }
   import(data: WikiImportRequest, opts?: RequestOptions) { return this.c.post<WikiImportResponse>('/api/wiki/import', data, opts) }
+}
+
+class PoliciesAPI {
+  private c: ViperClient
+  constructor(c: ViperClient) { this.c = c }
+  list(params?: PolicyListParams, opts?: RequestOptions) {
+    const qs = params ? '?' + new URLSearchParams(Object.entries(params).filter(([, v]) => v != null).map(([k, v]) => [k, String(v)])).toString() : ''
+    return this.c.get<PolicyListResponse>(`/api/policies${qs}`, opts)
+  }
+  get(id: string, opts?: RequestOptions) { return this.c.get<{ policy: Policy }>(`/api/policies/${id}`, opts) }
+  create(data: CreatePolicyRequest, opts?: RequestOptions) { return this.c.post<StatusResponse & { id: string }>('/api/policies', data, opts) }
+  update(id: string, data: UpdatePolicyRequest, opts?: RequestOptions) { return this.c.put<StatusResponse>(`/api/policies/${id}`, data, opts) }
+  delete(id: string, opts?: RequestOptions) { return this.c.del<StatusResponse>(`/api/policies/${id}`, opts) }
+  preview(projectId: string, opts?: RequestOptions) { return this.c.get<PolicyPreviewResponse>(`/api/policies/preview?project_id=${encodeURIComponent(projectId)}`, opts) }
 }
 
 class ReviewConfigsAPI {

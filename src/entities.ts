@@ -88,15 +88,32 @@ export interface Project {
 /** Wiki knowledge entry. */
 export interface WikiEntry {
   id: string
-  org_id: string
-  project_id: string | null
+  owner_type: 'org' | 'user'
+  owner_id: string
   title: string
   content: string
   category: string
   tags: string[]
-  scope: string[]
   match_count: number
   last_matched_at: string | null
+  created_at: string
+  updated_at: string
+}
+
+/** Policy — governs relationships between resources and targets. */
+export interface Policy {
+  id: string
+  org_id: string
+  name: string
+  description: string
+  resource_type: 'wiki' | 'token' | 'review_config' | 'model'
+  resource_id: string | null
+  target_type: 'project' | 'org'
+  target_id: string | null
+  effect: 'enforce' | 'suggest' | 'deny'
+  priority: number
+  conditions: { scope?: string[]; branches?: string[] }
+  enabled: boolean
   created_at: string
   updated_at: string
 }
