@@ -1,3 +1,10 @@
+/** Validation limits — shared between server and client. */
+export const LIMITS = {
+  WIKI_TITLE: 60,
+  POLICY_NAME: 60,
+  POLICY_DESCRIPTION: 280,
+} as const
+
 /** Organisation. */
 export interface Organisation {
   id: string

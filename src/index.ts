@@ -1,4 +1,5 @@
 export { ViperClient, ViperError } from './client.js'
 export type { ClientOptions, RequestOptions } from './client.js'
+export { LIMITS } from './entities.js'
 export type * from './entities.js'
 export type * from './api.js'
