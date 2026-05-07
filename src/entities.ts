@@ -12,6 +12,9 @@ export interface Organisation {
   created_at: string
 }
 
+/** Theme preference. */
+export type Theme = 'light' | 'dark' | 'system'
+
 /** User account. */
 export interface User {
   id: string
@@ -19,6 +22,7 @@ export interface User {
   name: string
   email: string
   role: 'admin' | 'member'
+  theme: Theme
   created_at: string
 }
 

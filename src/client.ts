@@ -1,5 +1,5 @@
 import type {
-  SignupRequest, SignupResponse, LoginRequest, LoginResponse, SessionResponse, StatusResponse,
+  SignupRequest, SignupResponse, LoginRequest, LoginResponse, SessionResponse, StatusResponse, PreferencesResponse, UpdatePreferencesRequest,
   ReviewListParams, ReviewListResponse, ReviewDetailResponse, ReviewStatsResponse,
   CreateTokenRequest, TokenListResponse, CreateTokenResponse,
   CreateConnectionRequest, ConnectionListResponse, CreateConnectionResponse,
@@ -110,6 +110,8 @@ class AuthAPI {
   login(data: LoginRequest, opts?: RequestOptions) { return this.c.post<LoginResponse>('/api/auth/login', data, opts) }
   session(opts?: RequestOptions) { return this.c.get<SessionResponse>('/api/auth/session', opts) }
   logout(opts?: RequestOptions) { return this.c.post<StatusResponse>('/api/auth/logout', undefined, opts) }
+  getPreferences(opts?: RequestOptions) { return this.c.get<PreferencesResponse>('/api/auth/preferences', opts) }
+  updatePreferences(data: UpdatePreferencesRequest, opts?: RequestOptions) { return this.c.put<StatusResponse & { theme: string }>('/api/auth/preferences', data, opts) }
 }
 
 class ReviewsAPI {

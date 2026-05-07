@@ -1,6 +1,6 @@
 import type {
   User, Review, Finding, Token, Connection,
-  Project, WikiEntry, ReviewConfig, Policy,
+  Project, WikiEntry, ReviewConfig, Policy, Theme,
 } from './entities.js'
 
 // --- Auth ---
@@ -10,6 +10,10 @@ export interface LoginRequest { email: string; password: string }
 export interface LoginResponse { status: string; user: User }
 export interface SessionResponse { user: User | null }
 export interface StatusResponse { status: string }
+
+// --- Preferences ---
+export interface PreferencesResponse { theme: Theme }
+export interface UpdatePreferencesRequest { theme: Theme }
 
 // --- Reviews ---
 export interface ReviewListParams { limit?: number; offset?: number; provider?: string; severity?: string; verdict?: string; project_id?: string; q?: string }
