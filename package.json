@@ -1,6 +1,6 @@
 {
   "name": "@supaproxy/viper-sdk",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Typed API client for Viper code reviewer",
   "type": "module",
   "main": "dist/index.js",
