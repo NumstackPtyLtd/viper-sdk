@@ -1,4 +1,4 @@
-/** Validation limits — shared between server and client. */
+/** Validation limits, shared between server and client. */
 export const LIMITS = {
   WIKI_TITLE: 60,
   POLICY_NAME: 60,
@@ -111,7 +111,7 @@ export interface WikiEntry {
   updated_at: string
 }
 
-/** Policy — governs relationships between resources and targets. */
+/** Policy: governs relationships between resources and targets. */
 export interface Policy {
   id: string
   org_id: string
